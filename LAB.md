@@ -90,7 +90,7 @@ answer:
 - Which number changed most, and does that surprise you?
 - `rows_in - rows_out` should equal exactly the exact-duplicate count.
   **Cleaning removes errors, not data.** Can you defend that?
-- 70 dates are ambiguous. What does that mean for anyone doing monthly
+- 57 dates are ambiguous. What does that mean for anyone doing monthly
   analysis on this column?
 
 Then the provenance questions at the bottom of the audit worksheet. They

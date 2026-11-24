@@ -42,6 +42,17 @@ COURSE_VARIANTS = {
 
 CAMPUSES = ["Chennai", "Coimbatore", "Madurai"]
 
+# Real structure, deliberately put in so that Weeks 9 and 10 have something
+# true to find. None of this is a data quality fault - it is signal.
+#
+#   fee depends on COURSE   -> explains why fee_paid is multimodal
+#   grade depends on CAMPUS -> the finding the Week 10 data story argues
+#   missing grades cluster at one campus -> the caveat that makes the story
+#                                           honest rather than just tidy
+COURSE_FEES = {"Data Science": 55000, "Computer Science": 48000, "Engineering": 32000}
+CAMPUS_GRADE_MEAN = {"Chennai": 72, "Coimbatore": 70, "Madurai": 62}
+CAMPUS_MISSING_WEIGHT = {"Chennai": 1, "Coimbatore": 1, "Madurai": 4}
+
 
 def messy_date(rng, year=2025):
     """Four date formats in one column. All four occur in real exports."""
@@ -67,18 +78,23 @@ def build_rows(rng):
     rows = []
     for student_id in range(1001, 1001 + ROWS):
         canonical = rng.choice(list(COURSE_VARIANTS))
+        campus = rng.choice(CAMPUSES)
         first, last = rng.choice(FIRST), rng.choice(LAST)
+
+        # Real signal: grade varies by campus, fee is set by course.
+        grade = rng.gauss(CAMPUS_GRADE_MEAN[campus], 11)
+        grade = round(min(99.0, max(31.0, grade)), 1)
 
         row = {
             "student_id": student_id,
             "first_name": first,
             "last_name": last,
             "course": rng.choice(COURSE_VARIANTS[canonical]),
-            "campus": rng.choice(CAMPUSES),
+            "campus": campus,
             "enrolled_on": messy_date(rng),
             "age": rng.randint(18, 45),
-            "fee_paid": messy_fee(rng, rng.choice([25000, 32000, 48000, 55000])),
-            "final_grade": round(rng.uniform(35, 95), 1),
+            "fee_paid": messy_fee(rng, COURSE_FEES[canonical]),
+            "final_grade": grade,
             "email": f"{first.lower()}.{last.lower()}@example.edu",
         }
         rows.append(row)
@@ -86,7 +102,17 @@ def build_rows(rng):
     # --- plant the faults ------------------------------------------------
 
     # Completeness: missing values in three different disguises.
-    for index in rng.sample(range(ROWS), 18):
+    #
+    # Missing grades are NOT spread evenly - they cluster at Madurai, the
+    # campus with the lowest mean. That makes the Week 10 data story honest:
+    # the campus that looks worst is also the one we know least about, so the
+    # true gap could be larger or smaller than the charts show. A dataset
+    # where missingness is random would teach the opposite lesson.
+    weights = [CAMPUS_MISSING_WEIGHT[rows[i]["campus"]] for i in range(ROWS)]
+    blanked = set()
+    while len(blanked) < 24:
+        blanked.add(rng.choices(range(ROWS), weights=weights, k=1)[0])
+    for index in blanked:
         rows[index]["final_grade"] = ""
     for index in rng.sample(range(ROWS), 12):
         rows[index]["campus"] = "N/A"          # text that looks like data

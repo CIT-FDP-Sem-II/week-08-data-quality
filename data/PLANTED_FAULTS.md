@@ -12,7 +12,7 @@ data.
 
 | Category | Fault | Count | How to find it |
 |---|---|---|---|
-| **Completeness** | `final_grade` blank | 18 | `df.final_grade == ""` — **not** `isna()`, they are empty strings |
+| **Completeness** | `final_grade` blank | 24 | `df.final_grade == ""` — **not** `isna()`, they are empty strings |
 | | `campus` = `"N/A"` | 12 | `value_counts()` — it appears as a category |
 | | `email` = whitespace only | 9 | `df.email.str.strip() == ""` |
 | **Consistency** | `course` written 12 ways for 3 courses | 12 distinct | `df.course.unique()` |
@@ -44,7 +44,7 @@ have no campus. Every count you report before fixing this is wrong, and
 nothing warns you.
 
 **3. The date ambiguity.** Most students parse the dates, see no error, and
-move on. 70 rows are genuinely ambiguous between UK and US order and **no
+move on. 57 rows are genuinely ambiguous between UK and US order and **no
 parser can resolve them**. The right answer is not a cleverer regex — it is to
 count them and report the number.
 
@@ -59,3 +59,22 @@ fix. Some only have a disclosure.
 - the near-duplicates found, not just the exact ones
 - the date ambiguity identified as **unresolvable**, with a count
 - a note that `isna()` is lying before step 2
+
+---
+
+## What is NOT a fault
+
+The generator also puts **real structure** into the data, deliberately, so
+that Weeks 9 and 10 have something true to find:
+
+| Structure | What it is |
+|---|---|
+| `fee_paid` is set by `course` | Three courses, three fees. This is why the column is multimodal and why its mean is a fee nobody pays |
+| `final_grade` varies by `campus` | Madurai averages about 6 points below the other two |
+| Missing grades cluster at Madurai | 21 of the 28 missing grades are from one campus |
+
+None of these is a data quality problem. Do not "fix" them.
+
+That last row is the one that matters in Week 10: the campus that looks worst
+is also the one we know least about. A dataset where missingness was random
+would teach the opposite, and easier, lesson.

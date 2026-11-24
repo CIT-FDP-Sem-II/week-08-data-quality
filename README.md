@@ -46,10 +46,10 @@ exact duplicates removed                  10
 near-duplicates (reported only)            6
 distinct courses before                   12
 distinct courses after                     3
-ambiguous dates (UK/US unresolvable)      70
+ambiguous dates (UK/US unresolvable)      57
 
 impossible values nulled
-  age                                       6
+  age                                       5
   final_grade                               3
   fee_paid                                  1
 ```
@@ -83,13 +83,13 @@ no opinion about being negative.
 
 ## The fault with no fix
 
-70 rows have a date like `03/04/2025`. That is 3 April or 4 March and
+57 rows have a date like `03/04/2025`. That is 3 April or 4 March and
 **nothing in the data can tell you which**. No parser resolves it. No regex
 helps.
 
 The pipeline parses day-first, counts the ambiguous rows, and **reports the
 number**. The number is the finding. Anyone doing monthly analysis on this
-column needs to know that 70 of 306 rows might be in the wrong month.
+column needs to know that 57 of 306 rows might be in the wrong month.
 
 Most data quality problems have a fix. Some only have a disclosure, and
 knowing the difference is the week's real content.

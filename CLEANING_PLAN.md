@@ -50,7 +50,7 @@ a real null.
 every downstream count is quietly wrong.
 
 **Decision — do not impute.** We mark them and keep them. Filling a missing
-grade with the mean would invent 18 students' performance, and the
+grade with the mean would invent 24 students' performance, and the
 distribution work in Week 9 would then be measuring our own arithmetic.
 Imputation is a modelling decision, not a cleaning decision.
 
